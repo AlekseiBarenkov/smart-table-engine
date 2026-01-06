@@ -2,11 +2,7 @@ import type { SteDataAdapter, SteDataPage, SteDataRequest } from '@/ste';
 import { createAdapter } from '@/ste/data/adapter/create-adapter';
 import type { SteId } from '@/ste/core';
 
-export type SteMemoryAdapterArgs<
-  RowId extends SteId = SteId,
-  ColId extends SteId = SteId,
-  RowData = unknown,
-> = {
+export type SteMemoryAdapterArgs<RowId extends SteId = SteId, ColId extends SteId = SteId, RowData = unknown> = {
   rows: ReadonlyArray<{ id: RowId; data: RowData }>;
   getCellValue: SteDataAdapter<RowId, ColId, RowData>['getCellValue'];
   sort?: (args: {
@@ -28,18 +24,13 @@ const applyPagination = <RowId extends SteId, RowData>(
   return rows.slice(start, start + pageSize);
 };
 
-export const createMemoryAdapter = <
-  RowId extends SteId = SteId,
-  ColId extends SteId = SteId,
-  RowData = unknown,
->(
+export const createMemoryAdapter = <RowId extends SteId = SteId, ColId extends SteId = SteId, RowData = unknown>(
   args: SteMemoryAdapterArgs<RowId, ColId, RowData>,
 ): SteDataAdapter<RowId, ColId, RowData> => {
   const getRows = async (req: SteDataRequest<ColId>): Promise<SteDataPage<RowId, RowData>> => {
     const total = args.rows.length;
 
-    const sorted =
-      req.sorting && args.sort ? args.sort({ rows: args.rows, sorting: req.sorting }) : args.rows;
+    const sorted = req.sorting && args.sort ? args.sort({ rows: args.rows, sorting: req.sorting }) : args.rows;
 
     const pageRows = applyPagination(sorted, req.pagination);
 

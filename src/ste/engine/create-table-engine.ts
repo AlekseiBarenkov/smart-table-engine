@@ -1,8 +1,6 @@
 import type { SteId, SteTable, SteTableState } from '@/ste/core';
 import type { SteDataAdapter, SteDataRequest } from '@/ste/data';
-import { setSorting } from '@/ste/actions/set-sorting';
-import { setPagination } from '@/ste/actions/set-pagination';
-
+import { setSorting, setPagination, setColumnWidth } from '@/ste/actions';
 import type { SteTableEngine } from './types';
 
 export type SteCreateTableEngineArgs<RowId extends SteId = SteId, ColId extends SteId = SteId, RowData = unknown> = {
@@ -17,6 +15,15 @@ export const createTableEngine = <RowId extends SteId = SteId, ColId extends Ste
 ): SteTableEngine<RowId, ColId, RowData> => {
   let table = args.table;
 
+  const listeners = new Set<(next: SteTableState<RowId, ColId>, prev: SteTableState<RowId, ColId>) => void>();
+
+  const subscribe = (listener: (next: SteTableState<RowId, ColId>, prev: SteTableState<RowId, ColId>) => void) => {
+    listeners.add(listener);
+    return () => {
+      listeners.delete(listener);
+    };
+  };
+
   const getTable = () => table;
   const getState = () => table.state;
 
@@ -28,6 +35,10 @@ export const createTableEngine = <RowId extends SteId = SteId, ColId extends Ste
 
     table = { ...table, state: next };
     args.onStateChange?.(next, prev);
+
+    for (const l of listeners) {
+      l(next, prev);
+    }
   };
 
   const setSortingPublic = (nextSorting: SteDataRequest<ColId>['sorting'] | null) => {
@@ -61,6 +72,16 @@ export const createTableEngine = <RowId extends SteId = SteId, ColId extends Ste
 
   const getCellValue = (x: { row: RowData; colId: ColId }) => args.adapter.getCellValue(x);
 
+  const getColumnWidth = (colId: ColId) => table.state.columnSizing?.get(colId);
+
+  const setColumnWidthPublic = (x: { colId: ColId; width: number; minWidth?: number; maxWidth?: number }) => {
+    const { next } = setColumnWidth<RowId, ColId>({
+      state: table.state,
+      columnWidth: { colId: x.colId, width: x.width, minWidth: x.minWidth, maxWidth: x.maxWidth },
+    });
+    setState(next);
+  };
+
   return {
     getTable,
     getState,
@@ -69,6 +90,9 @@ export const createTableEngine = <RowId extends SteId = SteId, ColId extends Ste
     setPagination: setPaginationPublic,
     query,
     getCellValue,
+    getColumnWidth,
+    setColumnWidth: setColumnWidthPublic,
+    subscribe,
     adapter: args.adapter,
   };
 };

@@ -11,12 +11,24 @@ export const setSorting = <RowId extends SteId = SteId, ColId extends SteId = St
 }): { prev: SteTableState<RowId, ColId>; next: SteTableState<RowId, ColId> } => {
   const prev = args.state;
 
-  const next: SteTableState<RowId, ColId> = args.sorting
-    ? { ...prev, sorting: { colId: args.sorting.colId, direction: args.sorting.direction } }
-    : (() => {
-        const { sorting: _sorting, ...rest } = prev;
-        return rest;
-      })();
+  if (!args.sorting) {
+    if (!prev.sorting) {
+      return { prev, next: prev };
+    }
+
+    const next: SteTableState<RowId, ColId> = { ...prev };
+    delete (next as { sorting?: unknown }).sorting;
+
+    return { prev, next };
+  }
+
+  const next: SteTableState<RowId, ColId> = {
+    ...prev,
+    sorting: {
+      colId: args.sorting.colId,
+      direction: args.sorting.direction,
+    },
+  };
 
   return { prev, next };
 };

@@ -17,8 +17,11 @@ export type SteSelection<RowId extends SteId = SteId> = {
   selectedRowIds: ReadonlySet<RowId>;
 };
 
+export type SteColumnSizing<ColId extends SteId = SteId> = ReadonlyMap<ColId, number>;
+
 export type SteTableState<RowId extends SteId = SteId, ColId extends SteId = SteId> = {
   sorting?: SteSorting<ColId>;
   pagination?: StePagination;
   selection?: SteSelection<RowId>;
+  columnSizing?: SteColumnSizing<ColId>;
 };

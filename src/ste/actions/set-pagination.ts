@@ -11,18 +11,24 @@ export const setPagination = <RowId extends SteId = SteId, ColId extends SteId =
 }): { prev: SteTableState<RowId, ColId>; next: SteTableState<RowId, ColId> } => {
   const prev = args.state;
 
-  const next: SteTableState<RowId, ColId> = args.pagination
-    ? {
-        ...prev,
-        pagination: {
-          page: Math.max(0, args.pagination.page),
-          pageSize: Math.max(1, args.pagination.pageSize),
-        },
-      }
-    : (() => {
-        const { pagination: _pagination, ...rest } = prev;
-        return rest;
-      })();
+  if (!args.pagination) {
+    if (!prev.pagination) {
+      return { prev, next: prev };
+    }
+
+    const next: SteTableState<RowId, ColId> = { ...prev };
+    delete (next as { pagination?: unknown }).pagination;
+
+    return { prev, next };
+  }
+
+  const next: SteTableState<RowId, ColId> = {
+    ...prev,
+    pagination: {
+      page: Math.max(0, args.pagination.page),
+      pageSize: Math.max(1, args.pagination.pageSize),
+    },
+  };
 
   return { prev, next };
 };

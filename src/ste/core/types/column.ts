@@ -13,9 +13,8 @@ export type SteColumn<ColId extends SteId = SteId> = {
 
   kind?: SteColumnKind;
 
-  /**
-   * Optional hints for rendering / formatting.
-   * Core doesn't interpret these, UI layer may.
-   */
+  width?: number;
+  minWidth?: number;
+
   meta?: SteMeta;
 };

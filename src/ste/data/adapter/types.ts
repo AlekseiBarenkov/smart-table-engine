@@ -11,16 +11,9 @@ export type SteDataPage<RowId extends SteId = SteId, RowData = unknown> = {
   total?: number;
 };
 
-export type SteCellGetter<RowData, ColId extends SteId = SteId> = (args: {
-  row: RowData;
-  colId: ColId;
-}) => unknown;
+export type SteCellGetter<RowData, ColId extends SteId = SteId> = (args: { row: RowData; colId: ColId }) => unknown;
 
-export type SteDataAdapter<
-  RowId extends SteId = SteId,
-  ColId extends SteId = SteId,
-  RowData = unknown,
-> = {
+export type SteDataAdapter<RowId extends SteId = SteId, ColId extends SteId = SteId, RowData = unknown> = {
   getRows: (req: SteDataRequest<ColId>) => Promise<SteDataPage<RowId, RowData>>;
 
   getCellValue: SteCellGetter<RowData, ColId>;

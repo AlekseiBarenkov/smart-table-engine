@@ -3,3 +3,4 @@ export * from './set-sorting';
 export * from './set-pagination';
 export * from './set-selection';
 export * from './reset-selection';
+export * from './set-column-width';

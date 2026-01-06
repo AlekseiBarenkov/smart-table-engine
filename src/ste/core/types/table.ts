@@ -3,11 +3,7 @@ import type { SteColumn } from './column';
 import type { SteRow } from './row';
 import type { SteTableState } from './state';
 
-export type SteTable<
-  RowId extends SteId = SteId,
-  ColId extends SteId = SteId,
-  RowData = unknown,
-> = {
+export type SteTable<RowId extends SteId = SteId, ColId extends SteId = SteId, RowData = unknown> = {
   id: SteId;
 
   columns: ReadonlyArray<SteColumn<ColId>>;

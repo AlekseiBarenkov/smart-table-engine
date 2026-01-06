@@ -13,18 +13,24 @@ export const setSelection = <RowId extends SteId = SteId, ColId extends SteId = 
 }): { prev: SteTableState<RowId, ColId>; next: SteTableState<RowId, ColId> } => {
   const prev = args.state;
 
-  const next: SteTableState<RowId, ColId> = args.selection
-    ? {
-        ...prev,
-        selection: {
-          mode: args.selection.mode,
-          selectedRowIds: args.selection.selectedRowIds,
-        },
-      }
-    : (() => {
-        const { selection: _selection, ...rest } = prev;
-        return rest;
-      })();
+  if (!args.selection) {
+    if (!prev.selection) {
+      return { prev, next: prev };
+    }
+
+    const next: SteTableState<RowId, ColId> = { ...prev };
+    delete (next as { selection?: unknown }).selection;
+
+    return { prev, next };
+  }
+
+  const next: SteTableState<RowId, ColId> = {
+    ...prev,
+    selection: {
+      mode: args.selection.mode,
+      selectedRowIds: args.selection.selectedRowIds,
+    },
+  };
 
   return { prev, next };
 };

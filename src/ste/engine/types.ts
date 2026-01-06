@@ -6,11 +6,9 @@ export type SteEngineQueryResult<RowId extends SteId = SteId, RowData = unknown>
   total?: number;
 };
 
-export type SteTableEngine<
-  RowId extends SteId = SteId,
-  ColId extends SteId = SteId,
-  RowData = unknown,
-> = {
+export type SteUnsubscribe = () => void;
+
+export type SteTableEngine<RowId extends SteId = SteId, ColId extends SteId = SteId, RowData = unknown> = {
   getTable: () => SteTable<RowId, ColId, RowData>;
   getState: () => SteTableState<RowId, ColId>;
 
@@ -19,9 +17,15 @@ export type SteTableEngine<
   setSorting: (next: SteDataRequest<ColId>['sorting'] | null) => void;
   setPagination: (next: SteDataRequest<ColId>['pagination'] | null) => void;
 
-  query: () => Promise<SteEngineQueryResult<RowId, RowData>>;
+  getColumnWidth: (colId: ColId) => number | undefined;
+  setColumnWidth: (args: { colId: ColId; width: number; minWidth?: number; maxWidth?: number }) => void;
 
+  query: () => Promise<SteEngineQueryResult<RowId, RowData>>;
   getCellValue: (args: { row: RowData; colId: ColId }) => unknown;
+
+  subscribe: (
+    listener: (next: SteTableState<RowId, ColId>, prev: SteTableState<RowId, ColId>) => void,
+  ) => SteUnsubscribe;
 
   adapter: SteDataAdapter<RowId, ColId, RowData>;
 };
